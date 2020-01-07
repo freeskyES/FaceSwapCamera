@@ -1,4 +1,4 @@
-package com.es.faceswapcamera.prototype.facedetection
+package com.es.faceswapcamera.prototype3.facedetection
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -9,14 +9,14 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 
-typealias FaceContourListener = (points: ArrayList<FaceContourGraphic.FaceContourData>,
-                                 faceInfo: FaceContourGraphic.FaceDetectInfo
+typealias ContourListener = (points: ArrayList<FaceContourGraphic.FaceContourData>,
+                             faceInfo: FaceContourGraphic.FaceDetectInfo
 ) -> Unit
 
 /** Graphic instance for rendering face contours graphic overlay view.  */
 class FaceContourGraphic(overlay: GraphicOverlay,
                          private val firebaseVisionFace: FirebaseVisionFace?,
-                         private var listener: FaceContourListener? = null) :
+                         private var listener: ContourListener? = null) :
     GraphicOverlay.Graphic(overlay) {
 
     private val list = ArrayList<FaceContourData>().apply { emptyList<FaceContourData>() }
@@ -61,17 +61,21 @@ class FaceContourGraphic(overlay: GraphicOverlay,
         canvas.drawRect(left, top, right, bottom, boxPaint)
 
         val contour = face.getContour(FirebaseVisionFaceContour.FACE)
+        var chinBottomPos: FaceContourData? = null
         for ((i, point) in contour.points.withIndex()) {
             val px = translateX(point.x)
             val py = translateY(point.y)
-            canvas.drawCircle(px, py, FACE_POSITION_RADIUS, facePositionPaint)
-//            canvas.drawText("i: ${i}", px -20, py + 30, idPaint)
+            if (i == 18) {
+//            canvas.drawText("i: ${i}", px -20, py + 50, idPaint)
+                canvas.drawCircle(px, py, FACE_POSITION_RADIUS, facePositionPaint)
+                chinBottomPos = FaceContourData(px, py)
+            }
 
             list.add(FaceContourData(px, py))
         }
         listener?.let {
             list.add(list[0])
-            it(list, FaceDetectInfo(left, top, right-left, bottom-top, x, y, Size(canvas.width, canvas.height)))
+            it(list, FaceDetectInfo(left, top, right-left, bottom-top, x, y, Size(canvas.width, canvas.height), chinBottomPos?.let { it } ?: FaceContourData(0.0f,0.0f)))
             return
         }
 
@@ -150,5 +154,6 @@ class FaceContourGraphic(overlay: GraphicOverlay,
                               val rectHeight: Float,
                               val centerPx: Float,
                               val centerPy: Float,
-                              val canvasSize: Size)
+                              val canvasSize: Size,
+                              val chinBottomPos: FaceContourData)
 }

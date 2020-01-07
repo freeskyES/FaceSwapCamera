@@ -9,7 +9,7 @@ import com.es.faceswapcamera.common.CameraImageGraphic
 import com.es.faceswapcamera.common.FrameMetadata
 import com.es.faceswapcamera.common.GraphicOverlay
 import com.es.faceswapcamera.common.VisionProcessorBase
-import com.es.faceswapcamera.prototype.facedetection.FaceGraphic
+import com.es.faceswapcamera.prototype3.facedetection.FaceGraphic
 import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
