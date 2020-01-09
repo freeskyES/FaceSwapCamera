@@ -12,7 +12,6 @@ import com.es.faceswapcamera.common.GraphicOverlay
 import com.es.faceswapcamera.common.VisionProcessorBase
 import com.es.faceswapcamera.prototype3.custom.ImagePreview
 import com.es.faceswapcamera.prototype3.manager.BgImageManager
-import com.es.faceswapcamera.prototype3.util.FaceBitmapUtils
 import com.es.faceswapcamera.prototype3.util.bgBitmapUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.FirebaseVision
@@ -56,7 +55,7 @@ class FaceContourDetectorProcessor2(val bgImageView: ImageView,
         bgImageManager =
             BgImageManager(bgOverlay)
         // bg face info
-        overlay.context.resources.getDrawable(R.drawable.test_model_2).run { // TODO 바꾸기
+        overlay.context.resources.getDrawable(R.drawable.test_model_4).run { // TODO 바꾸기
             originBitmapForBg = this.toBitmap()
         }
     }
@@ -148,6 +147,7 @@ class FaceContourDetectorProcessor2(val bgImageView: ImageView,
 
     companion object {
         private const val TAG = "FaceContourDetectorProc"
+
     }
 
 

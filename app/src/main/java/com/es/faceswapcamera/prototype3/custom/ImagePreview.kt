@@ -1,9 +1,7 @@
 package com.es.faceswapcamera.prototype3.custom
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.PixelFormat
-import android.graphics.PorterDuff
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
@@ -63,24 +61,42 @@ class ImagePreview(context: Context?, attrs: AttributeSet?) : SurfaceView(contex
 
     fun run(bgBitmap: Bitmap, faceInfo: FaceContourGraphic.FaceDetectInfo) {
 
-        val canvas = viewHolder.lockCanvas()
+        bgInfo?.let { bgface ->
 
-        // 새로그려지면 안쌓이게, Clear
-        canvas.drawColor(0, PorterDuff.Mode.CLEAR)
+            val canvas = viewHolder.lockCanvas()
 
-        val px = faceInfo.centerPx - bgBitmap.width / 2
-        val py = faceInfo.chinBottomPos.py
+            // 새로그려지면 안쌓이게, Clear
+            canvas.drawColor(0, PorterDuff.Mode.CLEAR)
+
+            val px = faceInfo.centerPx - bgBitmap.width / 2
+            val py = faceInfo.chinBottomPos.py
+
+            val ratio = faceInfo.rectWidth / bgface.rectWidth
+
+            val realPx = px + ( bgBitmap.width / 2 -  bgface.centerPx * ratio)
 
 
-        try {
-            Log.i("ImagePreview","px / py $px $py")
+            try {
+                val paint = blur(canvas)
+                Log.i("ImagePreview","px / py $realPx $py")
 
-            canvas.drawBitmap(bgBitmap, px, py, null)
+                canvas.drawBitmap(bgBitmap, realPx, py, paint)
 //                    canvas.drawBitmap(resizeBitmap, 0.0f, 0.0f, null)
-        } finally {
-            viewHolder.unlockCanvasAndPost(canvas)
+            } finally {
+                viewHolder.unlockCanvasAndPost(canvas)
+            }
         }
+    }
 
+    private fun blur(canvas: Canvas): Paint {
+        val paint = Paint()
+        paint.isAntiAlias = true
+
+        val blur = BlurMaskFilter(20.0f, BlurMaskFilter.Blur.NORMAL)
+        canvas.drawColor(Color.TRANSPARENT)
+        paint.maskFilter = blur
+
+        return paint
     }
 
     private fun deltaPx(targetWidth: Int): Int {
@@ -102,4 +118,5 @@ class ImagePreview(context: Context?, attrs: AttributeSet?) : SurfaceView(contex
     private fun getSquareCropDimensionForBitmap(bitmap: Bitmap): Int { //use the smallest dimension of the image to crop to
         return Math.min(bitmap.width, bitmap.height)
     }
+
 }

@@ -10,7 +10,7 @@
 
     <ImageView
         android:id="@+id/bgImageView"
-        android:src="@drawable/test_model_2"
+        android:src="@drawable/test_model_4"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:scaleType="centerCrop"
