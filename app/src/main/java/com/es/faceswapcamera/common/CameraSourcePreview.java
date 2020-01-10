@@ -156,11 +156,13 @@ public class CameraSourcePreview extends ViewGroup {
 
     //WHITE_BALANCE_WARM_FLUORESCENT : 약간 어둡다.
 
-    parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_INCANDESCENT);
+//    parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);//WHITE_BALANCE_INCANDESCENT
 
 
 
     int maxExpo = parameters.getMaxExposureCompensation();
+
+    Log.i("changeExposure","maxExpo : " + maxExpo);
 
     parameters.setExposureCompensation(maxExpo);
 

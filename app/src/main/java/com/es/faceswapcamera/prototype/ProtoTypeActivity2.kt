@@ -1,7 +1,6 @@
 package com.es.faceswapcamera.prototype
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.os.Bundle

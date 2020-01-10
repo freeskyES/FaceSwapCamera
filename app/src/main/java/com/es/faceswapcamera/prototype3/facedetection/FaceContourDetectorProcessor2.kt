@@ -1,4 +1,4 @@
-package com.es.faceswapcamera.prototype.facedetection
+package com.es.faceswapcamera.prototype3.facedetection
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -10,9 +10,9 @@ import com.es.faceswapcamera.common.CameraImageGraphic
 import com.es.faceswapcamera.common.FrameMetadata
 import com.es.faceswapcamera.common.GraphicOverlay
 import com.es.faceswapcamera.common.VisionProcessorBase
-import com.es.faceswapcamera.prototype.custom.ImagePreview
-import com.es.faceswapcamera.prototype.manager.BgImageManager
-import com.es.faceswapcamera.prototype.util.FaceBitmapUtils
+import com.es.faceswapcamera.prototype3.custom.ImagePreview
+import com.es.faceswapcamera.prototype3.manager.BgImageManager
+import com.es.faceswapcamera.prototype3.util.BgBitmapUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -24,10 +24,10 @@ import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
 
-class FaceContourDetectorProcessor(val bgImageView: ImageView,
-                                   val overlay: GraphicOverlay,
-                                   val bgOverlay: GraphicOverlay,
-                                   val faceImagePreview: ImagePreview
+class FaceContourDetectorProcessor2(val bgImageView: ImageView,
+                                    val overlay: GraphicOverlay,
+                                    val bgOverlay: GraphicOverlay,
+                                    val bgImagePreview: ImagePreview
 ) : VisionProcessorBase<List<FirebaseVisionFace>>(), CoroutineScope {
 
     private val detector: FirebaseVisionFaceDetector
@@ -52,9 +52,10 @@ class FaceContourDetectorProcessor(val bgImageView: ImageView,
 
         detector = FirebaseVision.getInstance().getVisionFaceDetector(options)
 
-        bgImageManager = BgImageManager(bgOverlay)
+        bgImageManager =
+            BgImageManager(bgOverlay)
         // bg face info
-        bgImageView.context.resources.getDrawable(R.drawable.test_model).run { // TODO 바꾸기
+        overlay.context.resources.getDrawable(R.drawable.test_model_4).run { // TODO 바꾸기
             originBitmapForBg = this.toBitmap()
         }
     }
@@ -95,7 +96,7 @@ class FaceContourDetectorProcessor(val bgImageView: ImageView,
                     override fun bringResultInfo(faceInfo: FaceContourGraphic.FaceDetectInfo, resizeBitmap: Bitmap) {
                         bgFaceInfo = faceInfo
                         originBitmapForBg = resizeBitmap
-                        faceImagePreview.updatePreviewInfo(faceInfo, resizeBitmap)
+                        bgImagePreview.updatePreviewInfo(faceInfo, Size(overlay.width, overlay.height) /*resizeBitmap*/)
                     }
                 })
             }
@@ -105,7 +106,7 @@ class FaceContourDetectorProcessor(val bgImageView: ImageView,
             val faceGraphic = FaceContourGraphic(
                     graphicOverlay,
                     it,
-                    object : FaceContourListener {
+                    object : ContourListener {
                         override fun invoke(points: ArrayList<FaceContourGraphic.FaceContourData>, faceInfo: FaceContourGraphic.FaceDetectInfo) {
                             originalCameraImage?.let { originFace -> face(originFace, points, faceInfo) }
                         }
@@ -116,29 +117,26 @@ class FaceContourDetectorProcessor(val bgImageView: ImageView,
 
         graphicOverlay.postInvalidate()
 
-
     }
 
+    /**
+     * face 정보 얻음
+     * bg face 정보에 맞게 resize
+     */
     private fun face(originalCameraImage: Bitmap, points: ArrayList<FaceContourGraphic.FaceContourData>, faceInfo: FaceContourGraphic.FaceDetectInfo) {
         CoroutineScope(coroutineContext).launch{
 
-            var faceBitmap: Bitmap? = null
-
             withContext(Dispatchers.IO) {
-                faceBitmap = FaceBitmapUtils.getFaceBitmap(originalCameraImage, faceImagePreview.context, points, faceInfo)
 
-                faceBitmap?.let { face ->
-                    FaceBitmapUtils.resizeFace2(originBitmapForBg, face, bgFaceInfo)?.run {
+                bgFaceInfo?.let {bgFaceInfo ->
 
-                        faceImagePreview.run(this)
-
-
-//                    Glide.with(bgImageView.context).asBitmap().load(this).dontAnimate().into(bgImageView)
+                    BgBitmapUtils.resizeFace(originBitmapForBg, originalCameraImage, bgFaceInfo, faceInfo)?.let { resizeBitmap ->
+                        bgImagePreview.run(resizeBitmap, faceInfo)
                     }
                 }
+
             }
             // main
-
         }
     }
 
@@ -149,6 +147,7 @@ class FaceContourDetectorProcessor(val bgImageView: ImageView,
 
     companion object {
         private const val TAG = "FaceContourDetectorProc"
+
     }
 
 

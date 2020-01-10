@@ -1,4 +1,4 @@
-package com.es.faceswapcamera.prototype
+package com.es.faceswapcamera.prototype3
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -16,20 +16,20 @@ import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import com.es.faceswapcamera.R
 import com.es.faceswapcamera.common.CameraSource
-import com.es.faceswapcamera.prototype.custom.ImagePreview
+import com.es.faceswapcamera.prototype3.custom.ImagePreview
 import com.google.android.gms.common.annotation.KeepName
 import com.google.firebase.ml.common.FirebaseMLException
-import com.es.faceswapcamera.prototype.facedetection.FaceContourDetectorProcessor
+import com.es.faceswapcamera.prototype3.facedetection.FaceContourDetectorProcessor
 import kotlinx.android.synthetic.main.activity_proto_type.*
 import java.io.IOException
 
-
 @KeepName
-class ProtoTypeActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
+class ProtoTypeActivity3 : AppCompatActivity(), OnRequestPermissionsResultCallback,
     OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
 
     private var cameraSource: CameraSource? = null
-    private var selectedModel = FACE_CONTOUR
+    private var selectedModel =
+        FACE_CONTOUR
     private lateinit var faceImagePreview: ImagePreview
 
     private val requiredPermissions: Array<String?>
@@ -52,7 +52,7 @@ class ProtoTypeActivity : AppCompatActivity(), OnRequestPermissionsResultCallbac
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
 
-        setContentView(R.layout.activity_proto_type)
+        setContentView(R.layout.activity_proto_type_3)
         faceImagePreview = findViewById(R.id.faceImageView)
         if (firePreview == null) {
             Log.d(TAG, "Preview is null")
@@ -207,7 +207,11 @@ class ProtoTypeActivity : AppCompatActivity(), OnRequestPermissionsResultCallbac
 
     private fun allPermissionsGranted(): Boolean {
         for (permission in requiredPermissions) {
-            if (!isPermissionGranted(this, permission!!)) {
+            if (!isPermissionGranted(
+                    this,
+                    permission!!
+                )
+            ) {
                 return false
             }
         }
@@ -217,14 +221,19 @@ class ProtoTypeActivity : AppCompatActivity(), OnRequestPermissionsResultCallbac
     private fun getRuntimePermissions() {
         val allNeededPermissions = arrayListOf<String>()
         for (permission in requiredPermissions) {
-            if (!isPermissionGranted(this, permission!!)) {
+            if (!isPermissionGranted(
+                    this,
+                    permission!!
+                )
+            ) {
                 allNeededPermissions.add(permission)
             }
         }
 
         if (allNeededPermissions.isNotEmpty()) {
             ActivityCompat.requestPermissions(
-                this, allNeededPermissions.toTypedArray(), PERMISSION_REQUESTS
+                this, allNeededPermissions.toTypedArray(),
+                PERMISSION_REQUESTS
             )
         }
     }

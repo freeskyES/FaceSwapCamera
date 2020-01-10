@@ -32,6 +32,9 @@
 
         <activity android:name=".prototype.ProtoTypeActivity"/>
         <activity android:name=".prototype.ProtoTypeActivity2"/>
+        <activity android:name=".prototype3.ProtoTypeActivity3"/>
+        <activity android:name=".prototype3.ProtoTypeActivity4"/>
+
 
     </application>
 

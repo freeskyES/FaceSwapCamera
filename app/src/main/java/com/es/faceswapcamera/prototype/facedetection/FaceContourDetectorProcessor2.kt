@@ -24,9 +24,6 @@ import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
 
-/**
- * Face Contour Demo.
- */
 class FaceContourDetectorProcessor2(val bgImageView: ImageView,
                                     val overlay: GraphicOverlay,
                                     val bgOverlay: GraphicOverlay,
