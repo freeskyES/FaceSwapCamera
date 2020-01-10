@@ -1,6 +1,7 @@
 package com.es.faceswapcamera.prototype3.manager
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.util.Log
 import android.util.Pair
 import android.util.Size
@@ -12,8 +13,8 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.es.faceswapcamera.prototype3.facedetection.FaceContourGraphic
 import java.util.ArrayList
 
-class BgImageManager(/*private val previewSize: Size,*/
-                     private val graphicOverlay: GraphicOverlay
+class BgImageManager(
+    private val graphicOverlay: GraphicOverlay
 ) {
 
     /**
@@ -38,10 +39,44 @@ class BgImageManager(/*private val previewSize: Size,*/
                 // 얼굴정보 얻기 성공
                 // 얼굴 밑으로 자르기
                 val croppedImage = splitImage(resizeBitmap, faceInfo)
+                // 배경 제거
+                val removedBg = removeBg(croppedImage, 1, 1)
                 // 내보내기
-                faceImage.bringResultInfo(faceInfo, croppedImage)
+                faceImage.bringResultInfo(faceInfo, removedBg)
             }
         })
+    }
+
+    private fun removeBg(imageBitmap: Bitmap, px: Int, py: Int): Bitmap {
+        val oldBitmap: Bitmap = imageBitmap
+        val colorToReplace = oldBitmap.getPixel(px, py)
+        val width = oldBitmap.width
+        val height = oldBitmap.height
+        val pixels = IntArray(width * height)
+        oldBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        val rA = Color.alpha(colorToReplace)
+        val rR = Color.red(colorToReplace)
+        val rG = Color.green(colorToReplace)
+        val rB = Color.blue(colorToReplace)
+        var pixel: Int
+        // iteration through pixels
+        for (y in 0 until height) {
+            for (x in 0 until width) { // get current index in 2D-matrix
+                val index = y * width + x
+                pixel = pixels[index]
+                val rrA = Color.alpha(pixel)
+                val rrR = Color.red(pixel)
+                val rrG = Color.green(pixel)
+                val rrB = Color.blue(pixel)
+                if (rA - COLOR_TOLERANCE < rrA && rrA < rA + COLOR_TOLERANCE && rR - COLOR_TOLERANCE < rrR && rrR < rR + COLOR_TOLERANCE && rG - COLOR_TOLERANCE < rrG && rrG < rG + COLOR_TOLERANCE && rB - COLOR_TOLERANCE < rrB && rrB < rB + COLOR_TOLERANCE
+                ) {
+                    pixels[index] = Color.TRANSPARENT
+                }
+            }
+        }
+        val newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        newBitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+        return newBitmap
     }
 
     private fun splitImage(targetBitmap: Bitmap, faceInfo: FaceContourGraphic.FaceDetectInfo): Bitmap {
@@ -135,8 +170,6 @@ class BgImageManager(/*private val previewSize: Size,*/
             Log.i("detect","!!")
 
             val faceGraphic = FaceContourGraphic(graphicOverlay, face) { points, faceInfo ->
-//                originBitmapForBg = firebaseVisionImage.bitmap
-//                getBgBitmap(it)
                 Log.i("detect","point"+ faceInfo)
                 callback.getPoints(points, faceInfo)
             }
@@ -144,5 +177,10 @@ class BgImageManager(/*private val previewSize: Size,*/
             graphicOverlay.add(faceGraphic)
 //            faceGraphic.updateFace(face)
         }
+    }
+
+    companion object {
+        const val TOUCH_TOLERANCE = 4f
+        const val COLOR_TOLERANCE = 20f
     }
 }

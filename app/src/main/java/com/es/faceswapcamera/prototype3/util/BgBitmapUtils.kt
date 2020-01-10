@@ -8,10 +8,10 @@ import android.util.Size
 import androidx.core.content.ContextCompat
 import com.es.faceswapcamera.R
 import com.es.faceswapcamera.prototype3.facedetection.FaceContourGraphic
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.floor
 
-object bgBitmapUtils {
+object BgBitmapUtils {
 
     fun getFaceBitmap(originFaceBitmap: Bitmap,
                       context: Context,
@@ -117,4 +117,5 @@ object bgBitmapUtils {
         )
         return resizedBitmap
     }
+
 }
